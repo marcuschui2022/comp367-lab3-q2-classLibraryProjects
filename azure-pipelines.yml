@@ -11,33 +11,40 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+  solution: '**/*.sln'
 
 steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '8.0.3'
-    installationPath: $(Agent.ToolsDirectory)/dotnet
-    includePreviewVersions: true
-  displayName: 'Install .NET SDK'
+# - task: DotNetCoreCLI@2
+#   inputs:
+#     command: 'custom'
+#     custom: 'msbuild'
+#     arguments: '/t:UpdateAssemblyInfo'
+#   displayName: 'Set Assembly Manifest Data'
 
 - task: NuGetToolInstaller@1
-  displayName: 'Use NuGet'
+  inputs:
+    versionSpec: '6.4'
+  displayName: 'Use NuGet 6.4'
 
 - task: NuGetCommand@2
   inputs:
-    restoreSolution: '**/*.sln'
+    restoreSolution: '$(solution)'
   displayName: 'NuGet Restore'
 
-- script: dotnet build --configuration $(buildConfiguration)
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:Configuration=$(buildConfiguration) /p:Platform="Any CPU"'
+    platform: 'Any CPU'
+    configuration: '$(buildConfiguration)'
   displayName: 'Build Solution'
 
 - task: NuGetCommand@2
   inputs:
     command: 'pack'
-    packagesToPack: 'StringLibrary/StringLibrary.csproj'
+    packagesToPack: '**/*.csproj'
     configuration: $(buildConfiguration)
-    packDestination: '$(Build.ArtifactStagingDirectory)'
+    versioningScheme: 'off'
   displayName: 'NuGet Pack'
 
 - task: PublishBuildArtifacts@1
