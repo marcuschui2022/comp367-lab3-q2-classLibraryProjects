@@ -16,20 +16,32 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '8.x'
+    version: '8.0.3'
     installationPath: $(Agent.ToolsDirectory)/dotnet
+  displayName: 'Install .NET SDK'
 
-- script: dotnet restore StringLibrary/StringLibrary.csproj
-  displayName: 'DotNet Restore'
+- task: NuGetToolInstaller@1
+  displayName: 'Use NuGet'
 
-- script: dotnet build StringLibrary/StringLibrary.csproj --no-restore --configuration $(buildConfiguration)
-  displayName: 'DotNet Build'
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '**/*.sln'
+  displayName: 'NuGet Restore'
 
-- script: dotnet pack StringLibrary/StringLibrary.csproj --no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
-  displayName: 'DotNet Pack'
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'Build Solution'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'pack'
+    packagesToPack: 'StringLibrary/StringLibrary.csproj'
+    configuration: $(buildConfiguration)
+    packDestination: '$(Build.ArtifactStagingDirectory)'
+  displayName: 'NuGet Pack'
 
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+  displayName: 'Publish Artifact'
