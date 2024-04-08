@@ -13,12 +13,12 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '8.0.3'
-    installationPath: $(Agent.ToolsDirectory)/dotnet
-  displayName: 'Install .NET SDK'
+# - task: UseDotNet@2
+#   inputs:
+#     packageType: 'sdk'
+#     version: '8.0.3'
+#     installationPath: $(Agent.ToolsDirectory)/dotnet
+#   displayName: 'Install .NET SDK'
 
 - task: NuGetToolInstaller@1
   displayName: 'Use NuGet'
