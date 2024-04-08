@@ -14,13 +14,6 @@ variables:
   solution: '**/*.sln'
 
 steps:
-# - task: DotNetCoreCLI@2
-#   inputs:
-#     command: 'custom'
-#     custom: 'msbuild'
-#     arguments: '/t:UpdateAssemblyInfo'
-#   displayName: 'Set Assembly Manifest Data'
-
 - task: NuGetToolInstaller@1
   inputs:
     versionSpec: '6.4'
@@ -46,6 +39,14 @@ steps:
     configuration: $(buildConfiguration)
     versioningScheme: 'off'
   displayName: 'NuGet Pack'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'Lab4-Feed' 
+  displayName: 'NuGet Push'
 
 - task: PublishBuildArtifacts@1
   inputs:
