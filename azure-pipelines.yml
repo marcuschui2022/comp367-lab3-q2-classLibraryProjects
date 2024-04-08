@@ -1,0 +1,35 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  name: lab4
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.x'
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
+- script: dotnet restore StringLibrary/StringLibrary.csproj
+  displayName: 'DotNet Restore'
+
+- script: dotnet build StringLibrary/StringLibrary.csproj --no-restore --configuration $(buildConfiguration)
+  displayName: 'DotNet Build'
+
+- script: dotnet pack StringLibrary/StringLibrary.csproj --no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+  displayName: 'DotNet Pack'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
