@@ -43,9 +43,9 @@ steps:
 - task: NuGetCommand@2
   inputs:
     command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
     nuGetFeedType: 'internal'
-    publishVstsFeed: 'Lab4-Feed' 
+    publishVstsFeed: '08692c93-c23e-462c-8ffe-3befd1a3f868/5c3efca0-2433-4545-b46c-23d40ef393a6'
   displayName: 'NuGet Push'
 
 - task: PublishBuildArtifacts@1
